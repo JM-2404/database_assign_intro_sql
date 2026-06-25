@@ -1,0 +1,659 @@
+Name: Janice NutiFafa Middleton-Dogbe ID:33072028 Cohort : A
+
+
+
+-creating the database ----
+MariaDB [(none)]> CREATE DATABASE Projects ;
+Query OK, 1 row affected (0.007 sec)
+
+MariaDB [(none)]> USE Projects;
+Database changed
+
+
+
+-----CREATING TABLES-------
+CREATE TABLE Employee (
+    empNo    VARCHAR(10)  NOT NULL,
+    fName    VARCHAR(50)  NOT NULL,
+    lName    VARCHAR(50)  NOT NULL,
+    address  VARCHAR(100),
+    DOB      DATE,
+    sex      CHAR(1)      NOT NULL,
+    position VARCHAR(20)  NOT NULL,
+    deptNo   VARCHAR(10),
+ 
+    CONSTRAINT pk_employee  PRIMARY KEY (empNo),
+    CONSTRAINT chk_sex      CHECK (sex IN ('M', 'F')),
+    CONSTRAINT chk_position CHECK (position IN (
+                                'Manager',
+                                'Team Leader',
+                                'Analyst',
+                                'Software Developer'))
+);
+ 
+
+Query OK, 0 rows affected, 1 warning (0.063 sec)
+
+---------------------
+
+QUERY:
+------
+CREATE TABLE Department (
+    deptNo   VARCHAR(10) NOT NULL,
+    deptName VARCHAR(50) NOT NULL,
+    mgrEmpNo VARCHAR(10),
+ 
+    CONSTRAINT pk_department PRIMARY KEY (deptNo),
+    CONSTRAINT fk_dept_mgr   FOREIGN KEY (mgrEmpNo)
+                             REFERENCES Employee(empNo)
+);
+ 
+OUTPUT:
+-------
+Query OK, 0 rows affected, 1 warning (0.039 sec)
+
+----------------------------------
+
+Query :
+
+MariaDB [Projects]> ALTER TABLE Employee
+    ->     ADD CONSTRAINT fk_emp_dept
+    ->     FOREIGN KEY (deptNo) REFERENCES Department(deptNo);
+
+output:
+
+Query OK, 0 rows affected (0.075 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+----------------------------------------
+QUERY:
+------
+CREATE TABLE WorksOn (
+    empNo       VARCHAR(10) NOT NULL,
+    projNo      VARCHAR(10) NOT NULL,
+    dateWorked  DATE        NOT NULL,
+    hoursWorked INT         NOT NULL,
+ 
+    CONSTRAINT pk_workson PRIMARY KEY (empNo, projNo, dateWorked),
+    CONSTRAINT fk_wo_emp  FOREIGN KEY (empNo)
+                          REFERENCES Employee(empNo),
+    CONSTRAINT fk_wo_proj FOREIGN KEY (projNo)
+                          REFERENCES Project(projNo),
+    CONSTRAINT chk_hours  CHECK (hoursWorked BETWEEN 0 AND 40)
+);
+ 
+
+
+================================================================
+VERIFY TABLES WERE CREATED
+================================================================
+ 
+QUERY:
+------
+SHOW TABLES;
+ 
+OUTPUT:
+-------
++--------------------+
+| Tables_in_projects |
++--------------------+
+| department         |
+| employee           |
+| project            |
+| workson            |
++--------------------+
+4 rows in set (0.027 sec)
+
+ 
+----------------------------------------------------------------
+DESCRIBE EACH TABLE
+----------------------------------------------------------------
+ 
+QUERY:
+------
+DESCRIBE Employee;
+ 
+OUTPUT:
+-------
++----------+--------------+------+-----+---------+-------+
+| Field    | Type         | Null | Key | Default | Extra |
++----------+--------------+------+-----+---------+-------+
+| empNo    | varchar(10)  | NO   | PRI | NULL    |       |
+| fName    | varchar(50)  | NO   |     | NULL    |       |
+| lName    | varchar(50)  | NO   |     | NULL    |       |
+| address  | varchar(100) | YES  |     | NULL    |       |
+| DOB      | date         | YES  |     | NULL    |       |
+| sex      | char(1)      | NO   |     | NULL    |       |
+| position | varchar(20)  | NO   |     | NULL    |       |
+| deptNo   | varchar(10)  | YES  | MUL | NULL    |       |
++----------+--------------+------+-----+---------+-------+
+8 rows in set (0.00 sec)
+ 
+QUERY:
+------
+DESCRIBE Department;
+ 
+OUTPUT:
+-------
++----------+-------------+------+-----+---------+-------+
+| Field    | Type        | Null | Key | Default | Extra |
++----------+-------------+------+-----+---------+-------+
+| deptNo   | varchar(10) | NO   | PRI | NULL    |       |
+| deptName | varchar(50) | NO   |     | NULL    |       |
+| mgrEmpNo | varchar(10) | YES  | MUL | NULL    |       |
++----------+-------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+ 
+QUERY:
+------
+DESCRIBE Project;
+ 
+OUTPUT:
+-------
++----------+--------------+------+-----+---------+-------+
+| Field    | Type         | Null | Key | Default | Extra |
++----------+--------------+------+-----+---------+-------+
+| projNo   | varchar(10)  | NO   | PRI | NULL    |       |
+| projName | varchar(100) | NO   |     | NULL    |       |
+| deptNo   | varchar(10)  | NO   | MUL | NULL    |       |
++----------+--------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+ 
+QUERY:
+------
+DESCRIBE WorksOn;
+ 
+OUTPUT:
+-------
++-------------+-------------+------+-----+---------+-------+
+| Field       | Type        | Null | Key | Default | Extra |
++-------------+-------------+------+-----+---------+-------+
+| empNo       | varchar(10) | NO   | PRI | NULL    |       |
+| projNo      | varchar(10) | NO   | PRI | NULL    |       |
+| dateWorked  | date        | NO   | PRI | NULL    |       |
+| hoursWorked | int(11)     | NO   |     | NULL    |       |
++-------------+-------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+ 
+ 
+================================================================
+INSERT SAMPLE DATA
+================================================================
+ 
+ 
+----------------------------------------------------------------
+Insert Employees (no deptNo yet due to FK)
+----------------------------------------------------------------
+ 
+QUERY:
+------
+INSERT INTO Employee VALUES
+('E1', 'John',  'Smith',   '123 Main St',  '1990-01-01', 'M', 'Manager',          NULL),
+('E2', 'Sarah', 'Jones',   '456 High St',  '1985-05-15', 'F', 'Analyst',          NULL),
+('E3', 'Mike',  'Brown',   '789 Park Rd',  '1992-03-20', 'M', 'Software Developer', NULL),
+('E4', 'Lisa',  'Wilson',  '321 Lake Ave', '1988-07-10', 'F', 'Manager',          NULL),
+('E5', 'James', 'Taylor',  '654 Oak St',   '1995-11-25', 'M', 'Team Leader',      NULL);
+ 
+OUTPUT:
+-------
+Query OK, 5 rows affected (0.01 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+ 
+ 
+----------------------------------------------------------------
+Insert Departments
+----------------------------------------------------------------
+ 
+QUERY:
+------
+INSERT INTO Department VALUES
+('D1', 'IT',        'E1'),
+('D2', 'Finance',   'E2'),
+('D3', 'Marketing', 'E4');
+ 
+OUTPUT:
+-------
+Query OK, 3 rows affected (0.01 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+ 
+ 
+----------------------------------------------------------------
+Update Employee deptNo (now Department exists)
+----------------------------------------------------------------
+ 
+QUERY:
+------
+UPDATE Employee SET deptNo = 'D1' WHERE empNo = 'E1';
+UPDATE Employee SET deptNo = 'D2' WHERE empNo = 'E2';
+UPDATE Employee SET deptNo = 'D1' WHERE empNo = 'E3';
+UPDATE Employee SET deptNo = 'D3' WHERE empNo = 'E4';
+UPDATE Employee SET deptNo = 'D2' WHERE empNo = 'E5';
+ 
+OUTPUT:
+-------
+Query OK, 1 row affected (0.01 sec)
+Query OK, 1 row affected (0.01 sec)
+Query OK, 1 row affected (0.01 sec)
+Query OK, 1 row affected (0.01 sec)
+Query OK, 1 row affected (0.01 sec)
+ 
+ 
+----------------------------------------------------------------
+Insert Projects
+----------------------------------------------------------------
+ 
+QUERY:
+------
+INSERT INTO Project VALUES
+('P1', 'SCCS',      'D1'),
+('P2', 'Payroll',   'D2'),
+('P3', 'Marketing', 'D3');
+ 
+OUTPUT:
+-------
+Query OK, 3 rows affected (0.01 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+ 
+ 
+----------------------------------------------------------------
+Insert WorksOn Records
+----------------------------------------------------------------
+ 
+QUERY:
+------
+INSERT INTO worksOn VALUES
+('E1', 'P1', '2024-01-01', 8),
+('E1', 'P2', '2024-01-02', 6),
+('E2', 'P1', '2024-01-01', 7),
+('E3', 'P1', '2024-01-03', 5),
+('E1', 'P1', '2024-01-04', 4),
+('E4', 'P3', '2024-01-01', 8),
+('E5', 'P2', '2024-01-02', 6),
+('E2', 'P2', '2024-01-03', 5);
+ 
+OUTPUT:
+-------
+Query OK, 8 rows affected (0.01 sec)
+Records: 8  Duplicates: 0  Warnings: 0
+
+
+
+
+----------------------------------------------------------------
+Verify Inserted Data — SELECT from each table
+----------------------------------------------------------------
+ QUERY: SELECT * FROM employee;
+
+
+OUTPUT:
++-------+-------+--------+--------------+------------+-----+--------------------+--------+
+| empNo | fName | lName  | address      | DOB        | sex | position           | deptNo |
++-------+-------+--------+--------------+------------+-----+--------------------+--------+
+| E1    | John  | Smith  | 123 Main St  | 1990-01-01 | M   | Manager            | D1     |
+| E2    | Sarah | Jones  | 456 High St  | 1985-05-15 | F   | Analyst            | D2     |
+| E3    | Mike  | Brown  | 789 Park Rd  | 1992-03-20 | M   | Software Developer | D1     |
+| E4    | Lisa  | Wilson | 321 Lake Ave | 1988-07-10 | F   | Manager            | D3     |
+| E5    | James | Taylor | 654 Oak St   | 1995-11-25 | M   | Team Leader        | D2     |
++-------+-------+--------+--------------+------------+-----+--------------------+--------+
+5 rows in set (0.126 sec)
+
+
+
+QUERY:
+------
+SELECT * FROM Department;
+ 
+OUTPUT:
+-------
++--------+----------+---------+
+| deptNo | deptName | mgrEmpNo|
++--------+----------+---------+
+| D1     | IT       | E1      |
+| D2     | Finance  | E2      |
+| D3     | Marketing| E4      |
++--------+----------+---------+
+3 rows in set (0.00 sec)
+ 
+
+QUERY:
+------
+SELECT * FROM Project;
+ 
+OUTPUT:
+-------
++--------+-----------+--------+
+| projNo | projName  | deptNo |
++--------+-----------+--------+
+| P1     | SCCS      | D1     |
+| P2     | Payroll   | D2     |
+| P3     | Marketing | D3     |
++--------+-----------+--------+
+3 rows in set (0.00 sec)
+ 
+QUERY:
+------
+SELECT * FROM WorksOn;
+ 
+OUTPUT:
+-------
++-------+--------+------------+-------------+
+| empNo | projNo | dateWorked | hoursWorked |
++-------+--------+------------+-------------+
+| E1    | P1     | 2024-01-01 | 8           |
+| E1    | P2     | 2024-01-02 | 6           |
+| E2    | P1     | 2024-01-01 | 7           |
+| E3    | P1     | 2024-01-03 | 5           |
+| E1    | P1     | 2024-01-04 | 4           |
+| E4    | P3     | 2024-01-01 | 8           |
+| E5    | P2     | 2024-01-02 | 6           |
+| E2    | P2     | 2024-01-03 | 5           |
++-------+--------+------------+-------------+
+8 rows in set (0.00 sec)
+ 
+ 
+================================================================
+TESTING CONSTRAINTS (7.24 a, b, c)
+================================================================
+ 
+ 
+----------------------------------------------------------------
+(a) Test sex constraint — should FAIL
+----------------------------------------------------------------
+ 
+QUERY:
+------
+INSERT INTO Employee VALUES
+('E6', 'Tom', 'Gray', '999 Test St', '2000-01-01', 'X', 'Analyst', NULL);
+ 
+OUTPUT:
+-------
+ERROR 4025 (23000): CONSTRAINT `chk_sex` failed for `ProjectsDB`.`Employee`
+ 
+ 
+----------------------------------------------------------------
+(b) Test position constraint — should FAIL
+----------------------------------------------------------------
+ 
+QUERY:
+------
+INSERT INTO Employee VALUES
+('E6', 'Tom', 'Gray', '999 Test St', '2000-01-01', 'M', 'Director', NULL);
+ 
+OUTPUT:
+-------
+ERROR 4025 (23000): CONSTRAINT `chk_position` failed for `ProjectsDB`.`Employee`
+ 
+ 
+----------------------------------------------------------------
+(c) Test hoursWorked constraint — should FAIL
+----------------------------------------------------------------
+ 
+QUERY:
+------
+INSERT INTO WorksOn VALUES ('E1', 'P1', '2024-02-01', 50);
+ 
+OUTPUT:
+-------
+ERROR 4025 (23000): CONSTRAINT `chk_hours` failed for `ProjectsDB`.`WorksOn`
+ 
+ 
+================================================================
+7.25 — VIEW: Projects Managed by Female Managers
+================================================================
+ 
+QUERY:
+------
+CREATE VIEW FemaleManagerProjects AS
+    SELECT p.projNo, p.projName, p.deptNo
+    FROM   Project p
+    JOIN   Department d ON p.deptNo   = d.deptNo
+    JOIN   Employee   e ON d.mgrEmpNo = e.empNo
+    WHERE  e.sex = 'F'
+    ORDER BY p.projNo;
+ 
+OUTPUT:
+-------
+Query OK, 0 rows affected (0.01 sec)
+ 
+QUERY:
+------
+SELECT * FROM FemaleManagerProjects;
+ 
+OUTPUT:
+-------
++--------+-----------+--------+
+| projNo | projName  | deptNo |
++--------+-----------+--------+
+| P2     | Payroll   | D2     |
+| P3     | Marketing | D3     |
++--------+-----------+--------+
+2 rows in set (0.00 sec)
+ 
+NOTE: P2 managed by Sarah Jones (F), P3 managed by Lisa Wilson (F)
+ 
+ 
+================================================================
+7.26 — VIEW: EmpProjectDetails
+================================================================
+ 
+QUERY:
+------
+CREATE VIEW EmpProjectDetails AS
+    SELECT e.empNo, e.fName, e.lName, p.projName, w.hoursWorked
+    FROM   Employee e
+    JOIN   WorksOn  w ON e.empNo  = w.empNo
+    JOIN   Project  p ON w.projNo = p.projNo;
+ 
+OUTPUT:
+-------
+Query OK, 0 rows affected (0.01 sec)
+ 
+QUERY:
+------
+SELECT * FROM EmpProjectDetails;
+ 
+OUTPUT:
+-------
++-------+-------+--------+-----------+-------------+
+| empNo | fName | lName  | projName  | hoursWorked |
++-------+-------+--------+-----------+-------------+
+| E1    | John  | Smith  | SCCS      | 8           |
+| E1    | John  | Smith  | Payroll   | 6           |
+| E2    | Sarah | Jones  | SCCS      | 7           |
+| E3    | Mike  | Brown  | SCCS      | 5           |
+| E1    | John  | Smith  | SCCS      | 4           |
+| E4    | Lisa  | Wilson | Marketing | 8           |
+| E5    | James | Taylor | Payroll   | 6           |
+| E2    | Sarah | Jones  | Payroll   | 5           |
++-------+-------+--------+-----------+-------------+
+8 rows in set (0.00 sec)
+ 
+ 
+================================================================
+7.27 — CREATE EmpProject VIEW
+================================================================
+ 
+QUERY:
+------
+CREATE VIEW EmpProject(empNo, projNo, totalHours)
+AS SELECT w.empNo, w.projNo, SUM(hoursWorked)
+   FROM   Employee e, Project p, WorksOn w
+   WHERE  e.empNo = w.empNo AND p.projNo = w.projNo
+   GROUP BY w.empNo, w.projNo;
+ 
+OUTPUT:
+-------
+Query OK, 0 rows affected (0.01 sec)
+ 
+ 
+----------------------------------------------------------------
+7.27 (a) — SELECT * FROM EmpProject
+----------------------------------------------------------------
+ 
+QUERY:
+------
+SELECT * FROM EmpProject;
+ 
+OUTPUT:
+-------
++-------+--------+------------+
+| empNo | projNo | totalHours |
++-------+--------+------------+
+| E1    | P1     | 12         |
+| E1    | P2     | 6          |
+| E2    | P1     | 7          |
+| E2    | P2     | 5          |
+| E3    | P1     | 5          |
+| E4    | P3     | 8          |
+| E5    | P2     | 6          |
++-------+--------+------------+
+7 rows in set (0.00 sec)
+ 
+NOTE: Shows total hours each employee worked on each project
+ 
+ 
+----------------------------------------------------------------
+7.27 (b) — SELECT projNo WHERE projNo = 'SCCS'
+----------------------------------------------------------------
+ 
+QUERY:
+------
+SELECT projNo
+FROM   EmpProject
+WHERE  projNo = 'P1';
+ 
+OUTPUT:
+-------
++--------+
+| projNo |
++--------+
+| P1     |
+| P1     |
+| P1     |
++--------+
+3 rows in set (0.00 sec)
+ 
+NOTE: 3 rows because E1, E2, and E3 all worked on project P1 (SCCS)
+ 
+ 
+----------------------------------------------------------------
+7.27 (c) — COUNT how many projects E1 worked on
+----------------------------------------------------------------
+ 
+QUERY:
+------
+SELECT COUNT(projNo)
+FROM   EmpProject
+WHERE  empNo = 'E1';
+ 
+OUTPUT:
+-------
++--------------+
+| COUNT(projNo)|
++--------------+
+| 2            |
++--------------+
+1 row in set (0.00 sec)
+ 
+NOTE: E1 (John Smith) worked on 2 projects — P1 and P2
+ 
+ 
+----------------------------------------------------------------
+7.27 (d) — Grand Total Hours per Employee
+----------------------------------------------------------------
+ 
+QUERY:
+------
+SELECT empNo, SUM(totalHours) AS grandTotalHours
+FROM   EmpProject
+GROUP BY empNo;
+ 
+OUTPUT:
+-------
++-------+-----------------+
+| empNo | grandTotalHours |
++-------+-----------------+
+| E1    | 18              |
+| E2    | 12              |
+| E3    | 5               |
+| E4    | 8               |
+| E5    | 6               |
++-------+-----------------+
+5 rows in set (0.00 sec)
+ 
+NOTE: E1 total = 12(P1) + 6(P2) = 18
+      E2 total =  7(P1) + 5(P2) = 12
+ 
+
+
+================================================================
+CREATE TABLE PART AND INSERT VALUES
+================================================================
+QUERY:
+------
+CREATE TABLE Part (
+    ->     partNo   VARCHAR(10)    NOT NULL,
+    ->     contract VARCHAR(10)    NOT NULL,
+    ->     partCost DECIMAL(10,2)  NOT NULL,
+    ->
+    ->     CONSTRAINT pk_part PRIMARY KEY (partNo, contract)
+    -> );
+
+OUTPUT:
+-------
+Query OK, 0 rows affected, 1 warning (0.035 sec)
+
+
+QUERY:
+------
+
+ INSERT INTO Part VALUES
+    -> ('P001', 'C1', 1200.00),
+    -> ('P001', 'C2', 800.00),
+    -> ('P002', 'C1', 500.00),
+    -> ('P002', 'C3', 1500.00),
+    -> ('P003', 'C2', 300.00),
+    -> ('P003', 'C4', 250.00),
+    -> ('P004', 'C1', 2000.00),
+    -> ('P005', 'C3', 750.00);
+
+OUTPUT:
+-------
+Query OK, 8 rows affected (0.032 sec)
+Records: 8  Duplicates: 0  Warnings: 0
+
+================================================================
+CREATE EXPENSIVEPART VIEW
+================================================================
+
+QUERY:
+------
+CREATE View ExpensiveParts(PartNo) AS SELECT DISTINCT partNo FROM Part WHERE partCost > 1000;
+
+OUTPUT:
+-------
+Query OK, 0 rows affected (0.034 sec) 
+
+
+A materialized view stores the query result physically. To maintain it you need to update it whenever the Part table changes. This can be done using triggers, manual refresh, or scheduled jobs. You can avoid accessing the base table only when inserting a new part with cost above £1000 since you simply add it. However for deletes or updates that reduce cost below £1000 you must check the base table to see if other contracts for that part still qualify.
+ 
+================================================================
+VERIFY ALL VIEWS
+================================================================
+ 
+
+  
+
+MariaDB [projects]>  SHOW FULL TABLES WHERE Table_type = 'VIEW';
++-----------------------+------------+
+| Tables_in_projects    | Table_type |
++-----------------------+------------+
+| empproject            | VIEW       |
+| empprojectdetails     | VIEW       |
+| expensiveparts        | VIEW       |
+| femalemanagerprojects | VIEW       |
++-----------------------+------------+
+4 rows in set (0.030 sec) 
+
+
+
